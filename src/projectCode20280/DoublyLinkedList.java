@@ -113,12 +113,31 @@ public class DoublyLinkedList<E> implements List<E> {
 
 		return tempheader.getElement();
 	}
+	private class ListIterator implements Iterator<E>
+	{
+		Node<E> curr;
+		public ListIterator(){
+			curr = header;
+		}
+		public boolean hasNext(){
+			return curr != null;
+		}
+
+		@Override
+		public E next()
+		{
+			E x = (E)curr.getElement();
+
+			curr = curr.getNext();
+			return x;
+		}
+	}
 
 	@Override
 	public Iterator<E> iterator() {
 
-		//return new ListIterator();
-		return null;
+		return new ListIterator();
+
 	}
 
 
@@ -140,25 +159,13 @@ public class DoublyLinkedList<E> implements List<E> {
 
 	@Override
 	public E removeLast() {
-		Node<E> previous = header;
-		Node<E> last = trailer;
-		if(isEmpty()) {
-			throw new IllegalArgumentException("Nothing to remove");
+		if(isEmpty())
+		{
+			return null;
 		}
-		else if(header.next == null) {
-			removeFirst();
-		}
-		else{
-			while(trailer.next != null)
-			{
-				previous = last;
-				last = last.next;
-			}
-			previous.next = null;
-		}
-		return previous.getElement();
+		return remove(size-1);
 	}
-	
+
 
 	@Override
 	public void addFirst(E e) {
@@ -183,7 +190,10 @@ public class DoublyLinkedList<E> implements List<E> {
 
 		while(counter > 0 && x != null)
 		{
-			toString += x.element;
+			if(x.element != null)
+			{
+				toString += x.element;
+			}
 			x = x.getNext();
 			counter--;
 		}
@@ -191,7 +201,8 @@ public class DoublyLinkedList<E> implements List<E> {
 	}
 	
 	public static void main(String[] args) {
-		   DoublyLinkedList<Integer> ll = new DoublyLinkedList<Integer>();
+
+		DoublyLinkedList<Integer> ll = new DoublyLinkedList<Integer>();
            ll.addFirst(0);
            ll.addFirst(1);
            ll.addFirst(2);
@@ -203,7 +214,7 @@ public class DoublyLinkedList<E> implements List<E> {
 
            ll.removeLast();
            System.out.println(ll);
-           
+
            for(Integer e: ll) {
                    System.out.println("value: " + e);
            }

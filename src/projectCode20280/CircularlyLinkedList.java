@@ -4,31 +4,54 @@ import java.util.Iterator;
 
 public class CircularlyLinkedList<E> implements List<E> {
 
-	private class Node<E> {
+	private Node<E> tail = null;
+	private int size = 0;
 
+
+	public CircularlyLinkedList(){}
+
+	private class Node<E> {
+		private E element;
+		private Node<E> next;
+		private Node<E> prev;
+
+		public Node(E e, Node<E> n)
+		{
+			element = e;
+
+			next = n;
+		}
+
+		public void setNext(Node<E> n) {
+			this.next = n;
+		}
+
+		public Node<E> getNext() {
+			return this.next;
+		}
+
+		public E getElement() {
+			return this.element;
+		}
 	}
 
 	@Override
 	public int size() {
-		// TODO Auto-generated method stub
-		return 0;
+		return size;
 	}
 
 	@Override
 	public boolean isEmpty() {
-		// TODO Auto-generated method stub
-		return false;
+		return size == 0;
 	}
 
 	@Override
 	public E get(int i) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public void add(int i, E e) {
-		// TODO Auto-generated method stub
 
 	}
 
@@ -40,7 +63,15 @@ public class CircularlyLinkedList<E> implements List<E> {
 
 	@Override
 	public E removeFirst() {
-		// TODO Auto-generated method stub
+		if(isEmpty())
+		{
+			return null;
+		}
+		Node<E> head = tail.getNext();
+		if(head == tail){
+			tail = null;
+		}
+		//else tail.setNext(head.)
 		return null;
 	}
 
@@ -58,8 +89,10 @@ public class CircularlyLinkedList<E> implements List<E> {
 
 	@Override
 	public void addFirst(E e) {
-		// TODO Auto-generated method stub
-
+		if(size == 0)
+		{
+			tail = new Node<>(e,null);
+		}
 	}
 
 	@Override

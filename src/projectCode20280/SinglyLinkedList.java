@@ -1,61 +1,219 @@
 package projectCode20280;
 
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 public class SinglyLinkedList<E> implements List<E> {
-	private Node<E> head = null;
-	private int size = 0;
 
 	private class Node<E> {
-		/// TODO
-		private E element;
-		private Node<E> next;
+		private E element; //element stored at this node
+		private Node <E> next; //store the following node
+		//private Node<E> iterator = this.next;
 
-		public Node (E data, Node<E> pointer)
-		{
-			this.element = data;
-			this.next = pointer;
+
+		public Node(E e, Node<E> n){
+			this.element = e;
+			this.next = n;
 		}
 
-
-		//Accessor methods
-		public E getElement() { return element; }
-
-		public Node<E> getNext() { return next; }
-
-		// Modifier methods
-		public void setNext(Node<E> n) { next = n; }  //----------- e
-
-
-		public E getElement(int i)
-		{
-			// TODO Auto-generated method stub
-			return null;
+		public E getElement() {
+			return element;
 		}
+
+		public Node<E> getNext() {
+			return next;
+		}
+
+		public void setNext(Node<E> next) {
+			this.next = next;
+		}
+
 	}
 
-	private class ListIterator implements Iterator<E>
-	{
-		Node curr;
-		public ListIterator()
-		{
-			curr = head;
-		}
+	class SinglyLinkedListIterator implements Iterator<E> {
 
-		public boolean hasNext()
-		{
-			return curr != null;
+		private Node<E> current;
+		private Node<E> previous;
+		private Node<E> previous2;
+		private boolean removeCalled;
+		public SinglyLinkedListIterator(){
+			current = head;
+			previous = null;
+			previous2 = null;
+			removeCalled = false;
 		}
 
 		@Override
-		public E next()
-		{
-			E res = (E) curr.getElement();
-			curr = curr.getNext();
-			return res;
+		public boolean hasNext() {
+			return current != null;
+		}
+
+		public E next(){
+			if (current == null){
+				throw new NoSuchElementException();
+			}
+			E temp = current.getElement();
+			previous2 = previous;
+			previous = current;
+			current = current.getNext();
+			removeCalled = false;
+			return temp;
+		}
+
+		@Override
+		public void remove() {
+			if (previous == null || removeCalled){
+				throw new IllegalStateException();
+			}
+			if (previous2 == null){
+				head = current;
+			}
+			else{
+				previous2.setNext(current);
+				previous = previous2; //Update remove to previous 2
+			}
+			size--;
+			removeCalled = true;
 		}
 	}
 
+	private Node<E> head = null; //first node of the list
+	private Node<E> tail = null; //last node in the list
+	private int size; //number of nodes in the list
+
+	//Finds the first element on the list- need this for implementing methods for ArrayStack
+	public E first(){
+		if (isEmpty()) return null;
+		return head.getElement();
+	}
+
+
+	@Override
+	public boolean isEmpty() {
+		return this.size() == 0;
+	}
+
+	@Override
+	public E get(int i) {
+		if (i < 0 || i >= size()){
+			throw new IndexOutOfBoundsException(i + "out of the range");
+		}
+		if(i < size()-1){
+			Node<E> current = head;
+			for (int j = 0; j < i; j++){
+				current = current.getNext(); // advance the node each time
+			}
+			return current.getElement(); //return element of the given index
+		}
+		return tail.getElement();
+
+	}
+	@Override
+	public Iterator<E> iterator() {
+		return new SinglyLinkedListIterator();
+	}
+
+	@Override
+	public int size() {
+		return this.size;
+	}
+
+	@Override
+	public E remove(int i) {
+		if (i < 0 || i >= size()){ //if the index if out of range
+			throw new IndexOutOfBoundsException(i + "Not in range!");
+		}
+		Iterator<E> iterator = this.iterator(); //get an Iterator for the list
+		for (int j = 0; j < i; j++){
+			iterator.next(); // call .next certain number of times until the index that I want to return
+		}
+		E e = iterator.next(); // store the element of the index
+		iterator.remove(); // remove the element
+		return  e;
+	}
+
+	@Override
+	public E removeFirst() {
+		if(isEmpty()) {
+			return null; //return null if no nodes to return
+		}
+
+		E first = head.getElement(); //set first node to get element in the head node
+		head = head.getNext(); //assign head to the next node
+		size--; //decrement size
+
+		if(size == 0) {
+			tail = null;
+		}
+		return first;
+
+	}
+
+	@Override
+	public E removeLast() {
+
+		if (isEmpty()){ return null;}
+
+		Node<E> current = head;
+		Node<E> previous = null;
+
+		while (current.getNext() != null){ //loop if next node is not null
+			previous = current; //set previous node to current
+			current = current.getNext(); //advance to the next node
+		}
+
+		previous.setNext(null);
+		tail = previous; //set tail to updated last node
+
+		return current.getElement();
+	}
+
+	@Override
+	public void add(int i, E e) {
+		if (i < 0 || i > size()){
+			throw new IndexOutOfBoundsException();
+		}
+		if (i == size()){ //add at end of list
+			addLast(e);
+			return;
+		}
+		if (i == 0){ //add start of list
+			addFirst(e);
+		}
+		else {
+			Node<E> current = head;
+			for (int j = 0; j < i-1; j++){ //loop through until the current node in the list
+				current = current.getNext(); //current is the node before the index
+			}
+			current.setNext(new Node<>(e, current.getNext())); //insert node where called in index
+		}
+		size++;
+	}
+
+	@Override
+	public void addFirst(E e) {
+		head = new Node<>(e, head);
+		if(size == 0) {
+			tail = head;
+		}
+		size++;
+	}
+
+	@Override
+	public void addLast(E e) {
+		Node<E> lastAdd = new Node<>(e, null);
+
+		if(isEmpty()) {
+			head = lastAdd;    //assign tail to the newest node if list is empty
+			tail = head;
+		}
+		else {
+			tail.setNext(lastAdd); //point tail to the new node
+			tail = lastAdd; // assign tail to the new node
+		}
+		size++; // increment number of nodes
+	}
 	public void printReverse()
 	{
 		printReverse1(this.head);
@@ -74,162 +232,9 @@ public class SinglyLinkedList<E> implements List<E> {
 		}
 	}
 
-
-	@Override
-	public boolean isEmpty()
-	{
-		// TODO Auto-generated method stub
-		return (head == null);
-	}
-
-	@Override
-	public void add(int i, E e) {
-		// TODO Auto-generated method stub
-		int counter = 0;
-		Node<E> temp = head.next;
-		while (counter != i && temp != null)
-		{
-			temp = temp.next;
-			counter++;
-		}
-		Node<E> p = new Node<E>(e,temp.next);
-		temp.next = p;
-		size++;
-	}
-
-	@Override
-	public E remove(int i)
-	{
-		// TODO Auto-generated method stubff
-		return null;
-	}
-
-	@Override
-	public Iterator<E> iterator()
-	{
-		return new ListIterator();
-	}
-
-
-	@Override
-	public E get(int i) {
-		return null;
-	}
-
-
-	@Override
-	public E removeFirst() {
-
-		if(isEmpty())
-		{
-			return null;
-		}
-		else
-		{
-		Node<E> temp = head;
-		head = head.next;
-		return temp.getElement();
-	}
-	}
-
-	@Override
-	public E removeLast() {
-		// TODO Auto-generated method stub
-		Node<E> previous = head;
-		Node<E> last = head.next;
-		if(isEmpty()) {
-			throw new IllegalArgumentException("Nothing to remove");
-		}
-		else if(head.next == null) {
-			removeFirst();
-		}
-		else{
-			while(last.next != null)
-			{
-				previous = last;
-				last = last.next;
-			}
-			previous.next = null;
-		}
-		return previous.getElement();
-	}
-
-	@Override
-	public void addFirst(E e) {
-		// TODO Auto-generated method stub
-		head = new Node<E>(e, head);
-		size++;
-	}
-
-	public int size()
-	{
-		return size;
-	}
-
-
-	@Override
-	public void addLast(E e)
-	{
-		// TODO Auto-generated method stub
-		Node<E> newest = new Node<E>(e,null);
-		Node<E> last = head;
-		if(last == null) {
-			head = newest;
-		}
-		else
-		{
-			while(last.getNext() != null) {
-				last = last.getNext();
-			}
-			last.setNext(newest);
-		}
-		size++;
-	}
-
-	@Override
-	public String toString()
-	{
-		ListIterator x = new ListIterator();
-
-		int counter = size;
-		String toString = "";
-
-		while(counter > 0 && x.curr != null)
-		{
-			toString += x.curr.element;
-			x.curr = x.curr.next;
-			counter--;
-		}
-		return toString;
-	}
-
-
-
 	public static void main(String[] args) {
-		String[] alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
-
-		SinglyLinkedList<String> sll = new SinglyLinkedList<String>();
-		for (String s : alphabet) {
-			//sll.addFirst(s);
-			sll.addLast(s);
-		}
-		//System.out.println(sll.toString());
-/*
-		sll.removeFirst();
-		System.out.println(sll.toString());
-		
-		sll.removeLast();
-		System.out.println(sll.toString());
-
-		sll.remove(2);
-		System.out.println(sll.toString());
-		
-		for (String s : sll) {
-			System.out.print(s + ", ");
-		}
-		*/
+		SinglyLinkedList<Integer> ll = new SinglyLinkedList<>();
 
 
-		sll.printReverse();
 	}
 }
