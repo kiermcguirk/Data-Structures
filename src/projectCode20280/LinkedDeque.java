@@ -19,7 +19,7 @@ public class LinkedDeque<E> implements Deque<E> {
 
 	@Override
 	public E first() {
-		return list.first();
+		return list.last();
 	}
 
 	@Override
