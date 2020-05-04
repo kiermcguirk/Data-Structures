@@ -1,149 +1,126 @@
 package projectCode20280;
-
-import java.util.Arrays;
 import java.util.Iterator;
-import java.util.NoSuchElementException;
+
 
 public class SinglyLinkedList<E> implements List<E> {
+	private Node<E> head = null;
+	private Node<E> tail = null;
+	private int size;
 
-	private class Node<E> {
-		private E element; //element stored at this node
-		private Node <E> next; //store the following node
-		//private Node<E> iterator = this.next;
+	private class Node<E>
+	{
+		private E element;
+		private Node <E> next;
 
-
-		public Node(E e, Node<E> n){
+		//constructors/getters/setters
+		public Node(E e, Node<E> n)
+		{
 			this.element = e;
 			this.next = n;
 		}
 
-		public E getElement() {
+		public E getElement()
+		{
 			return element;
 		}
 
-		public Node<E> getNext() {
-			return next;
-		}
-
-		public void setNext(Node<E> next) {
+		public void setNext(Node<E> next)
+		{
 			this.next = next;
 		}
 
+		public Node<E> getNext()
+		{
+			return next;
+		}
+
+
+
 	}
 
-	class SinglyLinkedListIterator implements Iterator<E> {
 
-		private Node<E> current;
-		private Node<E> previous;
-		private Node<E> previous2;
-		private boolean removeCalled;
-		public SinglyLinkedListIterator(){
-			current = head;
-			previous = null;
-			previous2 = null;
-			removeCalled = false;
-		}
-
-		@Override
-		public boolean hasNext() {
-			return current != null;
-		}
-
-		public E next(){
-			if (current == null){
-				throw new NoSuchElementException();
-			}
-			E temp = current.getElement();
-			previous2 = previous;
-			previous = current;
-			current = current.getNext();
-			removeCalled = false;
-			return temp;
-		}
-
-		@Override
-		public void remove() {
-			if (previous == null || removeCalled){
-				throw new IllegalStateException();
-			}
-			if (previous2 == null){
-				head = current;
-			}
-			else{
-				previous2.setNext(current);
-				previous = previous2; //Update remove to previous 2
-			}
-			size--;
-			removeCalled = true;
-		}
-	}
-
-	private Node<E> head = null; //first node of the list
-	private Node<E> tail = null; //last node in the list
-	private int size; //number of nodes in the list
-
-	//Finds the first element on the list- need this for implementing methods for ArrayStack
 	public E first(){
-		if (isEmpty()) return null;
+		if (isEmpty()) //empty
+			return null;
+		else
 		return head.getElement();
+	}
+
+	public E last()
+	{
+		if(isEmpty())
+			return null;
+		else
+		return tail.element;
 	}
 
 
 	@Override
-	public boolean isEmpty() {
+	public boolean isEmpty()
+	{
 		return this.size() == 0;
 	}
 
 	@Override
 	public E get(int i) {
-		if (i < 0 || i >= size()){
-			throw new IndexOutOfBoundsException(i + "out of the range");
+		if (i < 0){
+			throw new IllegalArgumentException(); //can't get negatiive index
 		}
-		if(i < size()-1){
-			Node<E> current = head;
-			for (int j = 0; j < i; j++){
-				current = current.getNext(); // advance the node each time
+		if(i < size() -1) //if last element
+		{
+			Node<E> curr= head;
+//
+			while(i > 0) //traverse to ith element
+			{
+				curr = curr.getNext();
+				i--;
 			}
-			return current.getElement(); //return element of the given index
+			return curr.getElement();
 		}
+
 		return tail.getElement();
 
 	}
 	@Override
-	public Iterator<E> iterator() {
+	public Iterator<E> iterator()
+	{
 		return new SinglyLinkedListIterator();
 	}
 
 	@Override
-	public int size() {
+	public int size()
+	{
 		return this.size;
 	}
 
 	@Override
 	public E remove(int i) {
-		if (i < 0 || i >= size()){ //if the index if out of range
-			throw new IndexOutOfBoundsException(i + "Not in range!");
+		if (i< 0)
+		{
+			throw new IllegalArgumentException();
 		}
-		Iterator<E> iterator = this.iterator(); //get an Iterator for the list
-		for (int j = 0; j < i; j++){
-			iterator.next(); // call .next certain number of times until the index that I want to return
+		Iterator<E> iterator = this.iterator();
+		for (int index = 0; index < i; index++){
+			iterator.next();
 		}
-		E e = iterator.next(); // store the element of the index
-		iterator.remove(); // remove the element
+		E e = iterator.next();
+		iterator.remove();
 		return  e;
 	}
 
 	@Override
 	public E removeFirst() {
-		if(isEmpty()) {
-			return null; //return null if no nodes to return
+		if(isEmpty())
+		{
+			return null;
 		}
 
-		E first = head.getElement(); //set first node to get element in the head node
-		head = head.getNext(); //assign head to the next node
-		size--; //decrement size
+		E first = head.getElement();
+		head = head.getNext();
+		size--;
 
-		if(size == 0) {
+		if(size == 0)
+		{
 			tail = null;
 		}
 		return first;
@@ -153,88 +130,157 @@ public class SinglyLinkedList<E> implements List<E> {
 	@Override
 	public E removeLast() {
 
-		if (isEmpty()){ return null;}
+		if (isEmpty())
+			return null;
 
-		Node<E> current = head;
-		Node<E> previous = null;
+		Node<E> curr = head;
+		Node<E> prev = null;
 
-		while (current.getNext() != null){ //loop if next node is not null
-			previous = current; //set previous node to current
-			current = current.getNext(); //advance to the next node
+		while (curr.getNext() != null)
+		{
+			prev = curr;
+			curr =curr.getNext();
 		}
 
-		previous.setNext(null);
-		tail = previous; //set tail to updated last node
+		prev.setNext(null);
+		tail = prev;
 
-		return current.getElement();
+		return curr.getElement();
 	}
 
 	@Override
 	public void add(int i, E e) {
-		if (i < 0 || i > size()){
-			throw new IndexOutOfBoundsException();
+		if (i < 0){
+			throw new IllegalArgumentException();
 		}
-		if (i == size()){ //add at end of list
+		if (i == size())
+		{
 			addLast(e);
 			return;
 		}
-		if (i == 0){ //add start of list
+		if (i == 0)
 			addFirst(e);
-		}
-		else {
-			Node<E> current = head;
-			for (int j = 0; j < i-1; j++){ //loop through until the current node in the list
-				current = current.getNext(); //current is the node before the index
+
+		else
+			{
+			Node<E> curr = head;
+			for (int j = 0; j < i-1; j++)
+			{
+				curr = curr.getNext();
 			}
-			current.setNext(new Node<>(e, current.getNext())); //insert node where called in index
+			curr.setNext(new Node<>(e, curr.getNext()));
 		}
+
 		size++;
 	}
 
 	@Override
-	public void addFirst(E e) {
+	public void addFirst(E e)
+	{
 		head = new Node<>(e, head);
-		if(size == 0) {
+		if(size == 0)
 			tail = head;
-		}
+
 		size++;
 	}
 
 	@Override
 	public void addLast(E e) {
-		Node<E> lastAdd = new Node<>(e, null);
+		Node<E> newest = new Node<>(e, null);
 
 		if(isEmpty()) {
-			head = lastAdd;    //assign tail to the newest node if list is empty
+			head = newest;
 			tail = head;
-		}
-		else {
-			tail.setNext(lastAdd); //point tail to the new node
-			tail = lastAdd; // assign tail to the new node
-		}
-		size++; // increment number of nodes
-	}
-	public void printReverse()
-	{
-		printReverse1(this.head);
-	}
-
-	private void printReverse1(Node<E> node)
-	{
-		if(node.next == null)
-		{
-			System.out.print(node.element + " ");
 		}
 		else
 		{
-			printReverse1(node.next);
-			System.out.print(node.element + " ");
+			tail.setNext(newest);
+			tail = newest;
+		}
+		size++;
+	}
+
+	@Override
+	public String toString()
+	{
+		String test = "";
+
+		String str = "[";
+		Node curr = head;
+		if(curr == null)
+		{
+			System.out.println("empty list");
+		}
+		else {
+			while (curr!= null)
+			{
+				str += curr.element;
+				if (curr.getNext() != null) {
+					str += ", ";
+				}
+				curr = curr.getNext();
+
+			}
+		}
+		str += "]";
+
+//		StringBuilder sb = new StringBuilder(result);
+//		sb.replace(sb.length()-3,sb.length(),"]" );
+		return str;
+	}
+	class SinglyLinkedListIterator implements Iterator<E> //Iterator for efficient deletion
+	{
+
+		private Node<E> curr;
+		private Node<E> prev;
+		private Node<E> prev2;
+		public SinglyLinkedListIterator()
+		{
+			curr = head;
+			prev = null;
+			prev2 = null;
+		}
+
+		@Override
+		public boolean hasNext()
+		{
+			return curr != null;
+		}
+
+		public E next(){
+			if (curr == null)
+			{
+				throw new IllegalArgumentException();
+			}
+			E temp = curr.getElement();
+			prev2 = prev;
+			prev = curr;
+
+			curr = curr.getNext();
+			return temp;
+		}
+
+		@Override
+		public void remove()
+		{
+			if (prev == null)
+				throw new IllegalArgumentException();
+
+			if (prev2 == null)
+				head = curr;
+			else
+			{
+				prev2.setNext(curr);
+				prev = prev2;
+			}
+
+			size--;
+
 		}
 	}
 
 	public static void main(String[] args) {
 		SinglyLinkedList<Integer> ll = new SinglyLinkedList<>();
-
 
 	}
 }

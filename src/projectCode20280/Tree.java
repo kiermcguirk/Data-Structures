@@ -5,7 +5,10 @@ import java.util.Iterator;
 /**
  * An interface for a tree where nodes can have an arbitrary number of children.
  */
-public interface Tree<E> extends Iterable<E> {
+public interface
+
+
+Tree<E> extends Iterable<E> {
 
   /**
    * Returns the root Position of the tree (or null if tree is empty).

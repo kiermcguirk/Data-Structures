@@ -21,6 +21,7 @@ public abstract class AbstractPriorityQueue<K,V> implements PriorityQueue<K,V> {
    * A concrete implementation of the Entry interface to be used within
    * a PriorityQueue implementation.
    */
+
   protected static class PQEntry<K,V> implements Entry<K,V> {
     private K k;  // key
     private V v;  // value
@@ -37,6 +38,11 @@ public abstract class AbstractPriorityQueue<K,V> implements PriorityQueue<K,V> {
     // utilities not exposed as part of the Entry interface
     protected void setKey(K key) { k = key; }
     protected void setValue(V value) { v = value; }
+
+    @Override
+    public int compareTo(Entry<K, V> o) {
+      return 0;
+    }
   } //----------- end of nested PQEntry class -----------
 
   // instance variable for an AbstractPriorityQueue
